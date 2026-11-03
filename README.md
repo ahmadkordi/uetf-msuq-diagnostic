@@ -93,7 +93,7 @@ their own licences and are not redistributed here. Checkpoints used:
 
 ## Licence
 
-See `Apache-2.0`.
+Licensed under the Apache License, Version 2.0 (see `LICENSE`).
 
 ## Citation
 
