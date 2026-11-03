@@ -1,0 +1,52 @@
+# U-ETF human validation: PILOT round (36 items, not analysed).
+# The main round uses config_uetf_main.yaml (same content, other output_dir and sizes).
+#
+# Model names are the middle part of the file names in /mnt/output.
+# To use the Llama-2 chat cells instead of base (once their stage H is complete for all
+# four datasets, HotpotQA merged), replace "Llama2_13b" by "Llama2chat_13b".
+
+seed: 20261019
+output_dir: /mnt/output/annotation/pilot
+
+datasets: [coqa, hotpotqa, nqopen, truthfulqa]
+models:   ["Llama2_13b", "llama3.1_8b", "Q2.5_14b"]
+judge_family_models: ["Q2.5_14b"]
+
+thresholds: [70, 90]
+correct_if: ">"                 # confirmed: score 90 is stored as correct = 0
+score_multiplier: 1
+
+per_stratum: 0                  # no main sheets in the pilot run
+pilot_per_stratum: 3            # 4 datasets x 3 bands x 3 = 36 items
+double_annotation_fraction: 1.0
+
+group_regex:
+  coqa: "^(.*)_\\d+$"           # ids look like <conversation>_<turn>
+
+sources:
+  - name: responses
+    path: "/mnt/output/stage_a_{dataset}_{model}.jsonl"
+    layout: nested
+    fields:
+      query_id: id
+      question: question
+      reference: gold_answer
+      other_references: additional_answers
+      responses: responses
+      response_item_key: text
+    overrides:
+      coqa:
+        fields: {context: story_so_far}   # the judge saw it too
+      truthfulqa:
+        fields:
+          reference: best_answer
+          other_references: correct_answers
+          incorrect_references: incorrect_answers
+
+  - name: judge
+    path: "/mnt/output/stage_h_correctness_{dataset}_{model}.jsonl"
+    layout: nested
+    fields:
+      query_id: id
+      scores: per_response
+      score_item_key: score

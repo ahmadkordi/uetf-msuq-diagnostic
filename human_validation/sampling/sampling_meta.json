@@ -1,0 +1,43 @@
+{
+  "created": "2026-10-24T18:57:46+00:00",
+  "seed": 20261020,
+  "thresholds": [
+    70.0,
+    90.0
+  ],
+  "correct_if": ">",
+  "band_labels": [
+    "le70",
+    "70to90",
+    "gt90"
+  ],
+  "datasets": [
+    "coqa",
+    "hotpotqa",
+    "nqopen",
+    "truthfulqa"
+  ],
+  "models": [
+    "Llama2_13b",
+    "Llama2chat_13b",
+    "llama3.1_8b",
+    "Q2.5_14b"
+  ],
+  "judge_family_models": [
+    "Q2.5_14b"
+  ],
+  "per_stratum": {
+    "le70": 48,
+    "70to90": 48,
+    "gt90": 48
+  },
+  "pilot_per_stratum": 0,
+  "double_annotation_fraction": 1.0,
+  "n_main": 576,
+  "n_pilot": 0,
+  "n_population": 1585200,
+  "n_dropped_no_score": 0,
+  "n_main_sharing_a_group": 0,
+  "config_sha256": "76b5cdf88072a98c21c17081c22152a568caa295a4582a2822a32adfc5b16753",
+  "key_sha256": "1822145804f541f6b2ab7fec0c1ef24d66b3ffe58d33ae65e3741ffbc21fee18"
+}

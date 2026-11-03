@@ -1,0 +1,17 @@
+dataset,model,le70,70to90,gt90
+coqa,Llama2_13b,32532,64642,62486
+coqa,Llama2chat_13b,15267,65207,79186
+coqa,Q2.5_14b,6351,75243,78066
+coqa,llama3.1_8b,17425,68093,74142
+hotpotqa,Llama2_13b,71270,40112,36718
+hotpotqa,Llama2chat_13b,30117,76466,41517
+hotpotqa,Q2.5_14b,69651,54794,23655
+hotpotqa,llama3.1_8b,50577,54231,43292
+nqopen,Llama2_13b,41070,21884,9246
+nqopen,Llama2chat_13b,32692,25763,13745
+nqopen,Q2.5_14b,36284,23131,12785
+nqopen,llama3.1_8b,42342,19783,10075
+truthfulqa,Llama2_13b,12223,3747,370
+truthfulqa,Llama2chat_13b,5954,8454,1932
+truthfulqa,Q2.5_14b,7536,7748,1056
+truthfulqa,llama3.1_8b,10786,4988,566

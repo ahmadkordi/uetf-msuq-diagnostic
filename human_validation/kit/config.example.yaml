@@ -1,0 +1,93 @@
+# Configuration for sample_for_annotation.py
+# Copy to config.yaml and edit. Run with --inspect first to see your key names.
+
+seed: 20261011                 # fixed before sampling; report it in the paper
+output_dir: annotation_out
+
+# Names exactly as they appear in your paths ({dataset} and {model} below).
+datasets: [coqa, nq_open, hotpotqa, truthfulqa]
+models:   [llama2_13b, llama31_8b, qwen25_14b]
+
+# Generators from the same family as the judge (for the same-family check).
+judge_family_models: [qwen25_14b]
+
+# Correctness rule of the paper: a response is correct if score > threshold.
+thresholds: [70, 90]
+correct_if: ">"                # ">" or ">="
+score_multiplier: 1            # set to 100 if your stored scores are in [0, 1]
+
+# Sample size. Strata = dataset x score band (<=70, 70-90, >90).
+per_stratum: 40                # 4 datasets x 3 bands x 40 = 480 responses
+# A different size per band is also possible (band names: le70, 70to90, gt90), e.g.
+# per_stratum: {le70: 50, 70to90: 50, gt90: 20}
+pilot_per_stratum: 3           # 36 extra items for the calibration round (not analysed)
+double_annotation_fraction: 1.0  # share of the main sample that annotator B also labels
+
+# At most one response per group. Default group = query id.
+# For CoQA, group by conversation (ids look like <conversation>_<turn>).
+group_regex:
+  coqa: "^(.*)_\\d+$"
+
+# Optional: text file with one query id per line; only these queries are sampled.
+include_query_ids_file: null
+
+# ---------------------------------------------------------------------------
+# SOURCES
+# One or more files per (dataset, model) cell. They are joined on query_id
+# (and on the position of the response inside the query).
+#
+# layout: nested -> one record per query, responses / scores are lists
+# layout: long   -> one record per response
+#
+# `fields` maps the names this kit needs (left) to YOUR key / column names (right).
+# Dotted paths are allowed (e.g. meta.gold.answer). Use "__key__" for query_id when
+# the file is a JSON dict keyed by query id. Leave a field out if you do not have it.
+#
+#   query_id              required in every source
+#   question, reference   required somewhere (reference may be a string or a list)
+#   context               optional (CoQA story / passage)
+#   other_references      optional (e.g. TruthfulQA correct_answers)
+#   incorrect_references  optional (e.g. TruthfulQA incorrect_answers)
+#   nested: responses, scores  (+ response_item_key / score_item_key if the list
+#                               items are dicts, e.g. {"text": ..., "score": ...})
+#   long:   response, score, sample_idx (sample_idx optional: row order is used)
+# ---------------------------------------------------------------------------
+sources:
+  - name: responses
+    path: "/data/uetf/{dataset}/{model}/responses.jsonl"
+    layout: nested
+    fields:
+      query_id: id
+      question: question
+      reference: answer
+      context: context
+      responses: responses
+      # response_item_key: text
+    # Per-dataset differences go here:
+    overrides:
+      truthfulqa:
+        fields:
+          reference: best_answer
+          other_references: correct_answers
+          incorrect_references: incorrect_answers
+
+  - name: judge_scores
+    path: "/data/uetf/{dataset}/{model}/correctness.jsonl"
+    layout: nested
+    fields:
+      query_id: id
+      scores: scores
+      # score_item_key: score
+
+# --- Example of a single long-format file instead of the two sources above ---
+# sources:
+#   - name: all
+#     path: "/data/uetf/{dataset}_{model}.csv"
+#     layout: long
+#     fields:
+#       query_id: qid
+#       sample_idx: sample
+#       question: question
+#       reference: gold
+#       response: response
+#       score: judge_score
